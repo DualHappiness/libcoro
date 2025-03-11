@@ -106,4 +106,10 @@ auto make_socket(const socket::options& opts) -> socket;
 auto make_accept_socket(
     const socket::options& opts, const net::ip_address& address, uint16_t port, int32_t backlog = 128) -> socket;
 
+auto make_multicast_socket(
+    const socket::options& opts,
+    const net::ip_address& address,
+    uint16_t               port,
+    const net::ip_address& multicast_address) -> socket;
+
 } // namespace coro::net

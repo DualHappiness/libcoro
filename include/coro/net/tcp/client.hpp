@@ -143,6 +143,8 @@ public:
         }
     }
 
+    options current_options() const { return m_options; }
+
 private:
     /// The tcp::server creates already connected clients and provides a tcp socket pre-built.
     friend server;

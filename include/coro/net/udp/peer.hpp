@@ -43,6 +43,11 @@ public:
      */
     explicit peer(std::shared_ptr<io_scheduler> scheduler, const info& bind_info);
 
+    /**
+     * Creates a udp peer for multicast.  This peer will bind to the given ip_port and join the multicast
+     */
+    explicit peer(std::shared_ptr<io_scheduler> scheduler, const info& bind_info, const net::ip_address& multicast_address);
+
     peer(const peer&)                             = default;
     peer(peer&&)                                  = default;
     auto operator=(const peer&) noexcept -> peer& = default;
