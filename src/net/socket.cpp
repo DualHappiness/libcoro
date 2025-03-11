@@ -143,4 +143,44 @@ auto make_accept_socket(const socket::options& opts, const net::ip_address& addr
     return s;
 }
 
+auto make_multicast_socket(
+    const socket::options& opts,
+    const net::ip_address& address,
+    uint16_t               port,
+    const net::ip_address& multicast_address) -> socket
+{
+    auto socket = make_socket(opts);
+
+    int reuse{1};
+    if (setsockopt(socket.native_handle(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0)
+    {
+        throw std::runtime_error{"Failed to setsockopt(SO_REUSEADDR | SO_REUSEPORT)"};
+    }
+
+    sockaddr_in server{};
+    server.sin_family = static_cast<int>(opts.domain);
+    server.sin_port   = htons(port);
+    server.sin_addr   = *reinterpret_cast<const in_addr*>(address.data().data());
+
+    if (bind(socket.native_handle(), (struct sockaddr*)&server, sizeof(server)) < 0)
+    {
+        throw std::runtime_error{"Failed to bind."};
+    }
+
+    int loop{1};
+    if (setsockopt(socket.native_handle(), IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)) < 0)
+    {
+        throw std::runtime_error{"Failed to setsockopt(IP_MULTICAST_LOOP)"};
+    }
+
+    struct ip_mreq mreq;
+    mreq.imr_multiaddr.s_addr = inet_addr(multicast_address.to_string().c_str());
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+    if (setsockopt(socket.native_handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)
+    {
+        throw std::runtime_error{"Failed to setsockopt(IP_ADD_MEMBERSHIP)"};
+    }
+    return socket;
+}
+
 } // namespace coro::net
