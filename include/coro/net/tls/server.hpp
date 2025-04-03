@@ -66,6 +66,10 @@ public:
      */
     auto accept(std::chrono::milliseconds timeout = std::chrono::seconds{30}) -> coro::task<coro::net::tls::client>;
 
+    options current_options() const { return m_options; }
+
+    int native_handle() const { return m_accept_socket.native_handle(); }
+    
 private:
     /// The io scheduler for awaiting new connections.
     std::shared_ptr<io_scheduler> m_io_scheduler{nullptr};
