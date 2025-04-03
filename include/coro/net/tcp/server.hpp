@@ -62,6 +62,9 @@ public:
     auto accept() -> coro::net::tcp::client;
 
     options current_options() const { return m_options; }
+    
+    int native_handle() const { return m_accept_socket.native_handle(); }
+    
 private:
     friend client;
     /// The io scheduler for awaiting new connections.
